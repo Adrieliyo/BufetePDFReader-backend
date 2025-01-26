@@ -4,7 +4,7 @@ Backend del proyecto de servicio social para el Bufete Estudiantil.
 
 ## Descripción
 
-Este proyecto proporciona servicios backend para la aplicación de lectura, extracción de datos y colocación de información extraída desde archivos PDF. Forma parte del proyecto de servicio social en el Bufete Estudiantil de la Facultad de Ingeniería.
+Este proyecto proporciona servicios backend para la aplicación de lectura, extracción de datos y colocación de información extraída desde archivos PDF. Forma parte del proyecto de servicio social en el Bufete Estudiantil de la Facultad de Ingeniería de la Universidad Autónoma de Sinaloa, Unidad Regional Norte.
 
 ## Configuración del Entorno
 
@@ -55,9 +55,13 @@ El backend está desarrollado con FastAPI y sigue una estructura modular para ma
 
 - `app/`: Contiene el código fuente principal.
   - `main.py`: Punto de entrada de la aplicación.
-  - `routers/`: Contiene los endpoints de la API.
+  - `routes/`: Contiene los endpoints de la API.
   - `services/`: Lógica de negocio y servicios de extracción de datos.
-  - `models/`: Definición de los modelos de datos.
+  - `models/`: Definición de los modelos de datos utilizados por la aplicación, generalmente para interactuar con la base de datos.
+  - `schemas/`: Esquemas de datos definidos mediante Pydantic para validar las solicitudes y respuestas de la API.
+  - `middlewares/`: Contiene lógica que se ejecuta entre las solicitudes y las respuestas, como la gestión de errores o autenticación.
+  - `utils/`: Funciones auxiliares y utilidades reutilizables en todo el proyecto.
+  - `config/`: Configuraciones globales del proyecto, como variables de entorno y configuraciones de la base de datos.
 
 ## Contribuciones
 
@@ -84,4 +88,7 @@ Este proyecto está licenciado bajo los términos de la [GNU General Public Lice
 
 ## Contacto
 
-Para preguntas o comentarios sobre el proyecto, puedes contactar al equipo del Bufete Estudiantil de la Facultad de Ingeniería.
+Para preguntas o comentarios sobre el proyecto, puedes contactar al equipo del Bufete Estudiantil de la Facultad de Ingeniería de la Universidad Autónoma de Sinaloa, Unidad Regional Norte.
+
+
+
