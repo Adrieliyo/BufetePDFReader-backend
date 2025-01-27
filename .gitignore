@@ -170,3 +170,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Docx Files
+**/docx_files
+*.docx

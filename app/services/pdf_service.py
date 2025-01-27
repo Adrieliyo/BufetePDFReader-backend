@@ -32,10 +32,15 @@ async def extraer_datos_del_pdf(file):
 
         datos_extraidos = extraer_datos(texto_completo)
 
-        return JSONResponse(content={
+        # return JSONResponse(content={
+        #     "status": "success",
+        #     "datos": datos_extraidos
+        # })
+        
+        return {
             "status": "success",
             "datos": datos_extraidos
-        })
+        }
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
