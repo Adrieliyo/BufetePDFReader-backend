@@ -10,7 +10,7 @@ def extraer_datos(texto: str) -> dict:
             "telefono": r"[Tt]eléfono:\s+(\d{3}\s*\d{3}\s*\d{4})",
             "cargo": r"[Cc]argo:\s*(.*?)\s*(?=\d|$)",
             "vigencia": r"3\.-\s*Vigencia del convenio solicitado:\s*(.*?)\s*(?:\n|$)",
-            "apoyo_economico": r"4\.-\s*Apoyo económico mensual propuesto:\s*(.*?)\s*(?:\n|$)",
+            "apoyo_economico": r"4\.-\s*Apoyo económico mensual propuesto:\s*([^5].*?)(?=\s*5\.-|$)",
             "responsable_practicas": r"5\.-\s*Nombre del responsable de prácticas profesionales \(.*?\):\s*(.*?)\s*Correo:",
             "correo_responsable": r"Correo:\s*([\w\.-]+@[\w\.-]+)",
             "telefono_responsable": r"5\.-.*?Teléfono:\s*(\d{10})",
@@ -22,10 +22,14 @@ def extraer_datos(texto: str) -> dict:
         datos = {}
         for campo, patron in patrones.items():
             match = re.search(patron, texto, re.IGNORECASE | re.DOTALL)
-            if not match:
-                raise ValueError(f"No se encontró el campo: {campo}")
-            datos[campo] = match.group(1).strip()
-
+            # if not match:
+            #     raise ValueError(f"No se encontró el campo: {campo}")
+            # datos[campo] = match.group(1).strip()
+            if match:
+                datos[campo] = match.group(1).strip()
+            else:
+                datos[campo] = ""
+            
         return datos
 
     except ValueError as e:
