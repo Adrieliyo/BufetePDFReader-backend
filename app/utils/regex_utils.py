@@ -29,7 +29,13 @@ def extraer_datos(texto: str) -> dict:
                 datos[campo] = match.group(1).strip()
             else:
                 datos[campo] = ""
-            
+        
+        # Datos extra estáticos a agregar
+        datos["nombre_escuela"] = "Facultad de Ingeniería Los Mochis"
+        datos["domicilio_escuela"] = "Fuente de Poseidón y Ángel Flores, Col. Jiquilpan Módulo B2 C.P. 81220."
+        datos["unidad_regional"] = "Unidad Regional Norte"
+        datos["nombre_director"] = "Dr. Rody Abraham Soto Rojo"
+
         return datos
 
     except ValueError as e:
