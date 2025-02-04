@@ -82,7 +82,7 @@ async def extract_data_and_modify_docx(
         document = Document(docx_path)
 
         # Insertar la fecha donde está la etiqueta {{FECHA}}
-        fecha_formato = datetime.now().strftime("%d/%m/%Y")
+        # fecha_formato = datetime.now().strftime("%d/%m/%Y")
 
         # Reemplazar en párrafos
         # for paragraph in document.paragraphs:

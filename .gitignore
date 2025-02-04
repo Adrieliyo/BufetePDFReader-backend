@@ -172,5 +172,5 @@ cython_debug/
 .pypirc
 
 # Docx Files
-**/docx_files
-*.docx
+# **/docx_files
+# *.docx
