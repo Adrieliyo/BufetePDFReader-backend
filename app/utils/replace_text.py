@@ -6,6 +6,31 @@ def reemplazar_texto(paragraph, etiqueta, valor):
             if etiqueta in run.text:
                 run.text = run.text.replace(etiqueta, valor)
 
+def reemplazar_en_tablas(document, reemplazos):
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for etiqueta, valor in reemplazos.items():
+                        # Convierte el valor a mayúsculas antes de reemplazar
+                        reemplazar_texto(paragraph, etiqueta, valor.upper())
+
+# def reemplazar_texto(paragraph, etiqueta, valor):
+#     # Unir el texto completo del párrafo
+#     full_text = "".join(run.text for run in paragraph.runs)
+    
+#     # Verificar si la etiqueta está en el texto completo
+#     if etiqueta in full_text:
+#         # Reemplazar el texto en cada run sin perder el formato
+#         new_text = full_text.replace(etiqueta, valor)
+        
+#         # Limpiar los runs existentes
+#         for run in paragraph.runs:
+#             run.text = ""
+
+#         # Asignar el nuevo texto al primer run
+#         paragraph.runs[0].text = new_text
+
 # Reemplaza todas las apariciones de las etiquetas. Sin embargo, quita el formato del texto original.
 # def reemplazar_texto(paragraph, etiqueta, valor):
 #     if etiqueta in paragraph.text:

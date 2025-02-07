@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
 from io import BytesIO
 from docx import Document
 from app.services.pdf_service import leer_pdf, extraer_datos_del_pdf
-from app.utils.replace_text import reemplazar_texto
+from app.utils.replace_text import reemplazar_texto, reemplazar_en_tablas
 from app.utils.numbers_to_words import numero_a_letras, mes_a_letras, anio_a_letras
 import os
 from datetime import datetime
@@ -41,14 +41,30 @@ async def extract_data_and_modify_docx(
         if numero_match:
             numero = int(numero_match.group(1))
             numero_vigencia = str(numero)
-            letra_vigencia = numero_a_letras(numero).upper()
+            letra_vigencia = numero_a_letras(numero)
         else:
             numero_vigencia = ""
             letra_vigencia = ""
 
+        apoyo_economico = datos_extraidos["datos"].get("apoyo_economico", "").strip()
+        # Extraer el número del apoyo económico usando regex
+        numero_apoyo_match = re.search(r'(\d{1,3}(?:,\d{3})*(?:\.\d+)?)', apoyo_economico)
+        if numero_apoyo_match:
+            # Eliminar las comas antes de convertir a float
+            numero_str = numero_apoyo_match.group(1).replace(',', '')
+            numero_apoyo = float(numero_str)
+            apoyo_numero = f"${numero_apoyo:,.2f}"
+            apoyo_letra = numero_a_letras(int(numero_apoyo))
+        else:
+            apoyo_numero = ""
+            apoyo_letra = ""
+
+        nombre_escuela = datos_extraidos["datos"].get("nombre_escuela", "")
+
         # Preparar diccionario de reemplazos
         reemplazos = {
-            "{{NOMBRE_ESCUELA}}": datos_extraidos["datos"].get("nombre_escuela", ""),
+            "{{NOMBRE_ESCUELA_UPPER}}": nombre_escuela.upper(),
+            "{{NOMBRE_ESCUELA}}": nombre_escuela,
             "{{DOMICILIO_ESCUELA}}": datos_extraidos["datos"].get("domicilio_escuela", ""),
             "{{NOMBRE_DIRECTOR}}": datos_extraidos["datos"].get("nombre_director", ""),
             "{{UNIDAD_REGIONAL}}": datos_extraidos["datos"].get("unidad_regional", ""),
@@ -58,19 +74,15 @@ async def extract_data_and_modify_docx(
             "{{NUMERO_VIGENCIA}}": numero_vigencia,
             "{{DIAS_LETRA}}": dia_letra.upper(),
             "{{MES_LETRA}}": mes_letra.upper(),
-            "{{ANIO_LETRA}}": anio_letra.upper()
+            "{{ANIO_LETRA}}": anio_letra.upper(),
+            "{{APOYO_NUMERO}}": apoyo_numero,
+            "{{APOYO_LETRA}}": apoyo_letra,
         }
 
-        # lugar_y_fecha = datos_extraidos["datos"].get("lugar_fecha", "")
-        apoyo_economico = datos_extraidos["datos"].get("apoyo_economico", "").strip()
-        # representante_legal = datos_extraidos["datos"].get("representante_legal", "")
-
-        # # Imprimir los datos extraídos para depuración
+        # Imprimir los datos extraídos para depuración
         print(f"Datos extraídos: {datos_extraidos}")
         print()
         print(f"Apoyo económico: {apoyo_economico}")
-        print()
-        print(f"Reemplazos:", reemplazos)
 
         # Determinar el archivo DOCX a usar
         if apoyo_economico:
@@ -81,21 +93,13 @@ async def extract_data_and_modify_docx(
         # Cargar el documento Word desde el sistema de archivos
         document = Document(docx_path)
 
-        # Insertar la fecha donde está la etiqueta {{FECHA}}
-        # fecha_formato = datetime.now().strftime("%d/%m/%Y")
-
-        # Reemplazar en párrafos
-        # for paragraph in document.paragraphs:
-        #     reemplazar_texto(paragraph, "{{FECHA}}", fecha_formato)
-
-        # Insertar lugar y fecha al inicio del documento
-        # first_paragraph = document.paragraphs[0]
-        # first_paragraph.insert_paragraph_before(texto_a_insertar)
-
         # Reemplazar en párrafos
         for paragraph in document.paragraphs:
             for etiqueta, valor in reemplazos.items():
                 reemplazar_texto(paragraph, etiqueta, valor)
+        
+        # Reemplazo en tablas
+        reemplazar_en_tablas(document, reemplazos)
 
         # Guardar el documento modificado en memoria
         output_stream = BytesIO()
