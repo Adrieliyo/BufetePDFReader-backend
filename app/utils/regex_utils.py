@@ -5,13 +5,17 @@ def extraer_datos(texto: str) -> dict:
     try:
         patrones = {
             "lugar_fecha": r"(?<!\w)(Los Mochis, Sinaloa, \d{1,2} de \w+ del \d{4})(?!\w)",
-            "representante_legal": r"2\.-\s*Nombre del representante legal de la empresa:\s*(.*?)\s*(?=Correo:|$)",
+            "nombre_empresa": r"Nombre de la empresa, dependencia pública o institución social:\s*(.*?)\s*(?=Actividad Económica:)",
+            "actividad_economica": r"Actividad Económica:\s*(.*?)\s*(?=Fecha de inicio de operaciones:)",
+            "fecha_inicio": r"Fecha de inicio de operaciones:\s*\d{2} de (\w+) de (\d{4})",
+            "domicilio": r"Domicilio:\s*(.*?)\s*(?=RFC:)",
+            "rfc": r"RFC:\s*([A-Z0-9]+)",
+            "representante_legal": r"Representante legal:\s*(.*?)\s*(?=Correo:)",
             "correo": r"[Cc]orreo:\s+([\w\.-]+@[\w\.-]+)",
             "telefono": r"[Tt]eléfono:\s+(\d{3}\s*\d{3}\s*\d{4})",
             "cargo": r"[Cc]argo:\s*(.*?)\s*(?=\d|$)",
             "vigencia": r"3\.-\s*Vigencia del convenio solicitado:\s*(.*?)\s*(?:\n|$)",
-            "apoyo_economico": r"4\.-\s*Apoyo económico mensual propuesto:\s*([^5].*?)(?=\s*5\.-|$)",
-            "responsable_practicas": r"5\.-\s*Nombre del responsable de prácticas profesionales \(.*?\):\s*(.*?)\s*Correo:",
+            "apoyo_economico": r"Apoyo económico mensual propuesto:\s*([^\n]+?)(?:\n|1-2|$)",          "responsable_practicas": r"Jefe inmediato:\s*(.*?)\s*(?=Correo:)",
             "correo_responsable": r"Correo:\s*([\w\.-]+@[\w\.-]+)",
             "telefono_responsable": r"5\.-.*?Teléfono:\s*(\d{10})",
             "cargo_responsable": r"5\.-.*?Cargo:\s*(.*?)(?:\n|$)",
@@ -25,8 +29,19 @@ def extraer_datos(texto: str) -> dict:
             # if not match:
             #     raise ValueError(f"No se encontró el campo: {campo}")
             # datos[campo] = match.group(1).strip()
+
+            # if match:
+            #     datos[campo] = match.group(1).strip()
+            # else:
+            #     datos[campo] = ""
+
             if match:
-                datos[campo] = match.group(1).strip()
+                valor = match.group(1).strip()
+                valor = re.sub(r'\s+', ' ', valor)  # Reemplaza múltiples espacios y saltos de línea con un solo espacio
+                if campo == "fecha_inicio":
+                    datos[campo] = f"{match.group(1)} {match.group(2)}"
+                else:
+                    datos[campo] = valor
             else:
                 datos[campo] = ""
         

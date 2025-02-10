@@ -60,16 +60,23 @@ async def extract_data_and_modify_docx(
             apoyo_letra = ""
 
         nombre_escuela = datos_extraidos["datos"].get("nombre_escuela", "")
+        nombre_empresa = datos_extraidos["datos"].get("nombre_empresa", "")
 
         # Preparar diccionario de reemplazos
         reemplazos = {
             "{{NOMBRE_ESCUELA_UPPER}}": nombre_escuela.upper(),
             "{{NOMBRE_ESCUELA}}": nombre_escuela,
+            "{{NOMBRE_EMPRESA_UPPER}}": nombre_empresa.upper(),
+            "{{NOMBRE_EMPRESA}}": nombre_empresa,
+            "{{REPRESENTANTE_LEGAL}}": datos_extraidos["datos"].get("representante_legal", ""),
+            "{{CARGO}}": datos_extraidos["datos"].get("cargo", ""),
+            "{{ACTIVIDAD_ECONOMICA}}": datos_extraidos["datos"].get("actividad_economica", ""),
+            "{{FECHA_INICIO}}": datos_extraidos["datos"].get("fecha_inicio", ""),
+            "{{DOMICILIO}}": datos_extraidos["datos"].get("domicilio", ""),
+            "{{RFC}}": datos_extraidos["datos"].get("rfc", ""),
             "{{DOMICILIO_ESCUELA}}": datos_extraidos["datos"].get("domicilio_escuela", ""),
             "{{NOMBRE_DIRECTOR}}": datos_extraidos["datos"].get("nombre_director", ""),
             "{{UNIDAD_REGIONAL}}": datos_extraidos["datos"].get("unidad_regional", ""),
-            "{{REPRESENTANTE_LEGAL}}": datos_extraidos["datos"].get("representante_legal", ""),
-            "{{CARGO}}": datos_extraidos["datos"].get("cargo", ""),
             "{{LETRA_VIGENCIA}}": letra_vigencia,
             "{{NUMERO_VIGENCIA}}": numero_vigencia,
             "{{DIAS_LETRA}}": dia_letra.upper(),
@@ -85,7 +92,7 @@ async def extract_data_and_modify_docx(
         print(f"Apoyo económico: {apoyo_economico}")
 
         # Determinar el archivo DOCX a usar
-        if apoyo_economico:
+        if '$' in apoyo_economico:
             docx_path = os.path.join("app/docx_files", "ConvenioRemunerado.docx")
         else:
             docx_path = os.path.join("app/docx_files", "ConvenioNoRemunerado.docx")
