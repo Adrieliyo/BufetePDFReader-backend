@@ -7,7 +7,11 @@ class UserBase(BaseModel):
     email: EmailStr
 
 # Esquema para crear un usuario (incluye contraseña)
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    username: str
+    names: str
+    lastnames: str
+    email: EmailStr
     password: str
 
 # Esquema para leer un usuario (excluye contraseña)

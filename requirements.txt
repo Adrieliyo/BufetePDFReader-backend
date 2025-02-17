@@ -10,3 +10,7 @@ psycopg2
 alembic
 python-dotenv
 pytz
+bcrypt
+pyjwt
+pydantic[email]
+fastapi-mail

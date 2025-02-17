@@ -21,3 +21,4 @@ class User(Base):
     # Relaciones
     role = relationship("Role", back_populates="users")
     status = relationship("UserStatus", back_populates="users")
+    password_resets = relationship("PasswordReset", back_populates="user")

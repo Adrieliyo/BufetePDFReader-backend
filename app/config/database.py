@@ -15,10 +15,11 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# # Importar todos los modelos aquí
+# Importar todos los modelos aquí
 from app.models.users import User
 from app.models.roles import Role
 from app.models.user_status import UserStatus
+from app.models.password_resets import PasswordReset
 
 # Crear todas las tablas
 Base.metadata.create_all(bind=engine)
