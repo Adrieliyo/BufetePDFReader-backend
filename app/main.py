@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from app.middlewares.auth_required import authRequired
 from app.config.database import SessionLocal
 from app.routes.pdf_routes import router as pdf_router
 from app.routes.register_routes import router as register_router
@@ -26,9 +27,16 @@ def get_db():
         db.close()
 
 # Registrar rutas
-app.include_router(pdf_router)
+
+# Rutas públicas (no requieren autenticación)
 app.include_router(register_router)
 app.include_router(auth_router)
+
+# Rutas protegidas (requieren autenticación)
+app.include_router(
+    pdf_router,
+    dependencies=[Depends(authRequired)],
+)
 
 @app.get("/")
 async def root():
