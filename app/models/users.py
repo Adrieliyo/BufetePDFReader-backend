@@ -17,6 +17,7 @@ class User(Base):
     status_id = Column(Integer, ForeignKey('user_status.id'), nullable=False)
     created_at = Column(TimezoneAware, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     updated_at = Column(TimezoneAware, server_default=text("CURRENT_TIMESTAMP"), onupdate=text("CURRENT_TIMESTAMP"), nullable=False)
+    profile_image = Column(String, nullable=True)
 
     # Relaciones
     role = relationship("Role", back_populates="users")

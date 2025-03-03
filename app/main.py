@@ -6,6 +6,8 @@ from app.config.database import SessionLocal
 from app.routes.pdf_routes import router as pdf_router
 from app.routes.register_routes import router as register_router
 from app.routes.auth_routes import router as auth_router
+from app.routes.user_routes import router as user_router
+
 
 app = FastAPI()
 
@@ -36,6 +38,16 @@ app.include_router(auth_router)
 app.include_router(
     pdf_router,
     dependencies=[Depends(authRequired)],
+)
+
+app.include_router(
+    user_router,
+    dependencies=[Depends(authRequired)]
+)
+
+app.include_router(
+    user_router,
+    dependencies=[Depends(authRequired)]
 )
 
 @app.get("/")
