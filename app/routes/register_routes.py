@@ -4,8 +4,8 @@ from app.config.database import SessionLocal
 from app.schemas.user_schema import UserCreate
 from app.models.users import User
 from app.utils.password_utils import hash_password
-# from app.utils.verification_token import generate_verification_token
-# from app.config.mail_config import send_verification_email
+from app.utils.verification_token import generate_verification_token
+from app.config.mail_config import send_verification_email
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -62,14 +62,22 @@ async def register_user(
         # verification_token = generate_verification_token(new_user.id)
 
         # Send verification email
-        # await send_account_verification(new_user.email, verification_token)
+        # await send_verification_email(new_user.email, verification_token)
         
-        # Generar token de verificación
+        # # Generar token de verificación
         # verification_token = generate_verification_token(new_user.id)
 
-        # Enviar correo en segundo plano
+        # # Enviar correo en segundo plano
         # background_tasks.add_task(send_verification_email, new_user.email, verification_token)
 
+        # Generar y enviar email en un bloque try separado
+        try:
+            verification_token = generate_verification_token(new_user.id)
+            await send_verification_email(new_user.email, verification_token)
+        except Exception as mail_error:
+            # No hacer rollback, solo registrar el error
+            print(f"Error sending verification email: {str(mail_error)}")
+            # Opcionalmente, actualizar el estado del usuario o añadir un flag
 
         return {
             "message": "User created successfully. Please check your email to verify your account.",

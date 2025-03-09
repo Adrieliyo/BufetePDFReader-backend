@@ -7,6 +7,7 @@ from app.routes.pdf_routes import router as pdf_router
 from app.routes.register_routes import router as register_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.user_routes import router as user_router
+from app.routes.mail_test_routes import router as mail_test_router
 
 
 app = FastAPI()
@@ -33,6 +34,8 @@ def get_db():
 # Rutas públicas (no requieren autenticación)
 app.include_router(register_router)
 app.include_router(auth_router)
+
+app.include_router(mail_test_router)
 
 # Rutas protegidas (requieren autenticación)
 app.include_router(
