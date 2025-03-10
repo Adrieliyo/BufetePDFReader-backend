@@ -16,3 +16,21 @@ def generate_verification_token(user_id: int) -> str:
     }
     
     return jwt.encode(token_data, secret_key, secret_algorithm)
+
+def verify_token(token: str):
+    try:
+        secret_key = getenv("SECRET_KEY")
+        secret_algorithm = getenv("SECRET_ALGORITHM")
+        
+        payload = jwt.decode(token, secret_key, algorithms=[secret_algorithm])
+        
+        # Extraer user_id del token
+        user_id = payload.get("user_id")
+        
+        return user_id
+    except jwt.ExpiredSignatureError:
+        # Token ha expirado
+        return None
+    except jwt.InvalidTokenError:
+        # Token inválido
+        return None

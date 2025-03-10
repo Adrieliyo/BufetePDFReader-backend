@@ -4,8 +4,8 @@ from app.config.database import SessionLocal
 from app.schemas.user_schema import UserCreate
 from app.models.users import User
 from app.utils.password_utils import hash_password
-from app.utils.verification_token import generate_verification_token
-from app.config.mail_config import send_verification_email
+from app.utils.verification_token import generate_verification_token, verify_token
+from app.config.mail_config import send_verification_email_smtp
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -20,8 +20,8 @@ def get_db():
 @router.post("/register")
 async def register_user(
     user_data: UserCreate,
-    db: Session = Depends(get_db),
-    # background_tasks: BackgroundTasks = Depends()
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
 ):
     try:
         # Check if email already exists
@@ -58,29 +58,19 @@ async def register_user(
         db.commit()
         db.refresh(new_user)
 
-        # Generate verification token
-        # verification_token = generate_verification_token(new_user.id)
+        # Generar token de verificación
+        verification_token = generate_verification_token(new_user.id)
 
-        # Send verification email
-        # await send_verification_email(new_user.email, verification_token)
-        
-        # # Generar token de verificación
-        # verification_token = generate_verification_token(new_user.id)
-
-        # # Enviar correo en segundo plano
-        # background_tasks.add_task(send_verification_email, new_user.email, verification_token)
-
-        # Generar y enviar email en un bloque try separado
-        try:
-            verification_token = generate_verification_token(new_user.id)
-            await send_verification_email(new_user.email, verification_token)
-        except Exception as mail_error:
-            # No hacer rollback, solo registrar el error
-            print(f"Error sending verification email: {str(mail_error)}")
-            # Opcionalmente, actualizar el estado del usuario o añadir un flag
+        # Añadir tarea de envío de correo en segundo plano
+        background_tasks.add_task(
+            send_verification_email_smtp, 
+            email=new_user.email, 
+            token=verification_token,
+            username=new_user.username
+        )
 
         return {
-            "message": "User created successfully. Please check your email to verify your account.",
+            "message": "Usuario creado exitosamente. Por favor, revisa tu correo electrónico para verificar tu cuenta.",
             "user": {
                 "id": new_user.id,
                 "username": new_user.username,
@@ -92,5 +82,40 @@ async def register_user(
         db.rollback()
         raise HTTPException(
             status_code=400,
-            detail=f"Error creating new user: {str(e)}"
+            detail=f"Error al crear nuevo usuario: {str(e)}"
+        )
+
+@router.get("/verify")
+async def verify_email(token: str, db: Session = Depends(get_db)):
+    try:
+        # Verificar token y obtener ID de usuario
+        user_id = verify_token(token)
+        
+        if not user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Token inválido o expirado"
+            )
+        
+        # Buscar usuario
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="Usuario no encontrado"
+            )
+        
+        # Actualizar estado del usuario a activo
+        user.status_id = 1  # Estado activo
+        db.commit()
+        
+        return {
+            "message": "Cuenta verificada exitosamente",
+            "username": user.username
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error al verificar cuenta: {str(e)}"
         )
