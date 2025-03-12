@@ -29,7 +29,7 @@ async def register_user(
         if existing_user:
             raise HTTPException(
                 status_code=400,
-                detail="Email already registered"
+                detail="Este correo electrónico ya está registrado"
             )
         
          # Check if username already exists
@@ -37,7 +37,7 @@ async def register_user(
         if existing_username:
             raise HTTPException(
                 status_code=400,
-                detail="Username already taken"
+                detail="El nombre de usuario ya ha sido tomado"
             )
 
         # Hash password
@@ -103,6 +103,13 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=404,
                 detail="Usuario no encontrado"
+            )
+        
+        # Verificar si el usuario ya está activado
+        if user.status_id == 1:
+            raise HTTPException(
+                status_code=400,
+                detail="Este usuario ya ha sido activado"
             )
         
         # Actualizar estado del usuario a activo
