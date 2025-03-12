@@ -46,7 +46,8 @@ def send_email(email_data: EmailSchema) -> Dict[str, Any]:
 
 # Función alternativa para enviar correo de verificación mediante smtplib
 def send_verification_email_smtp(email: EmailStr, token: str, username: str = None):
-    verification_url = f"http://localhost:8000/auth/verify?token={token}"
+    # verification_url = f"http://localhost:8000/auth/verify?token={token}"
+    verification_url = f"http://localhost:5173/verify-user?token={token}"
     
     greeting = f"Hola {username}," if username else "Hola,"
     
