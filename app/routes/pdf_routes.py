@@ -31,6 +31,25 @@ async def extract_data_and_modify_docx(
 
         # Extraer datos del PDF
         datos_extraidos = await extraer_datos_del_pdf(pdf_file)
+
+            # Extraer datos del PDF
+        datos_extraidos = await extraer_datos_del_pdf(pdf_file)
+        
+        # Verificar que el PDF contiene los datos mínimos necesarios para procesar
+        campos_requeridos = ["nombre_empresa", "representante_legal", "cargo", "domicilio", "rfc"]
+        campos_faltantes = []
+        
+        for campo in campos_requeridos:
+            if not datos_extraidos["datos"].get(campo):
+                campos_faltantes.append(campo)
+        
+        if campos_faltantes:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"El PDF no contiene la información necesaria. Campos faltantes: {', '.join(campos_faltantes)}"
+            )
+
+
         fecha_actual = datetime.now()
         dia_letra = numero_a_letras(fecha_actual.day)
         mes_letra = mes_a_letras(fecha_actual.month)
@@ -123,12 +142,19 @@ async def extract_data_and_modify_docx(
         nombre_archivo = f"{os.path.splitext(os.path.basename(docx_path))[0]}_{fecha_actual_formateada}_{letras_aleatorias}.docx"
 
         # Devolver el documento modificado como respuesta
+        # return StreamingResponse(
+        #     output_stream,
+        #     media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        #     headers={"Content-Disposition": f"attachment; filename={nombre_archivo}"}
+        # )
         return StreamingResponse(
             output_stream,
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            headers={"Content-Disposition": f"attachment; filename={nombre_archivo}"}
+            headers={
+                "Content-Disposition": f'attachment; filename="{nombre_archivo}"',
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
         )
-
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

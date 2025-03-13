@@ -15,10 +15,11 @@ app = FastAPI()
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configurar según necesidades
+    allow_origins=["http://localhost:5173"],  # Configurar según necesidades
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"],
 )
 
 # Dependencia para obtener la sesión de BD
@@ -41,7 +42,7 @@ app.include_router(mail_test_router)
 # Rutas protegidas (requieren autenticación)
 app.include_router(
     pdf_router,
-    dependencies=[Depends(authRequired)],
+    dependencies=[Depends(authRequired)]
 )
 
 app.include_router(

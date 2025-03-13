@@ -36,6 +36,16 @@ async def extraer_datos_del_pdf(file):
         #     "status": "success",
         #     "datos": datos_extraidos
         # })
+
+         # Verificar que se haya podido extraer al menos algunos datos importantes
+        datos_importantes = ["nombre_empresa", "representante_legal"]
+        datos_encontrados = [campo for campo in datos_importantes if datos_extraidos.get(campo)]
+        
+        if not datos_encontrados:
+            raise HTTPException(
+                status_code=400, 
+                detail="El PDF no parece contener el formato esperado para la extracción de datos"
+            )
         
         return {
             "status": "success",
